@@ -19,11 +19,11 @@ class MicronautKafkaThreadingTest {
     @Test
     void test() throws InterruptedException {
         int i = 0;
-        while (i < 50) {
+        while (i < 1000) {
             producer.produce("Hello world! (" + i++ + ")").blockingGet();
         }
         // Give the application some slack
-        Thread.sleep(1000);
-        assertEquals(50, consumer.getMessages().size());
+        Thread.sleep(10000);
+        assertEquals(1000, consumer.getMessages().size());
     }
 }

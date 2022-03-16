@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
     offsetStrategy = OffsetStrategy.SYNC_PER_RECORD
 )
 public class MyConsumer {
+    int count = 0;
 
     private static final Logger log = LoggerFactory.getLogger(MyConsumer.class);
 
@@ -28,9 +29,12 @@ public class MyConsumer {
 
     @Topic("my-topic")
     public void consumeRaw(@MessageBody String message, long offset) {
+        count++;
+        if (count < 501) {
+            throw new RuntimeException("I can't let you do that");
+        }
         messages.put(offset, message);
         log.info("Reading message {}", message);
-        throw new RuntimeException("I can't let you do that");
     }
 
     @EventListener
