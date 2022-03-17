@@ -23,7 +23,7 @@ class MicronautKafkaThreadingTest {
             producer.produce("Hello world! (" + i++ + ")").blockingGet();
         }
         // Give the application some slack
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         assertEquals(1000, consumer.getMessages().size());
     }
 }

@@ -8,6 +8,7 @@ import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.messaging.annotation.MessageBody;
 import io.micronaut.runtime.event.annotation.EventListener;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,20 +22,24 @@ public class MyConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(MyConsumer.class);
 
-    public ConcurrentHashMap<Long, String> getMessages() {
+    public ConcurrentHashMap<String, String> getMessages() {
         return messages;
     }
 
-    private final ConcurrentHashMap<Long, String> messages = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> messages = new ConcurrentHashMap<>();
 
     @Topic("my-topic")
-    public void consumeRaw(@MessageBody String message, long offset) {
+    public void consumeRaw(ConsumerRecord<String, String> record) {
+        var message = record.value();
+        var offset = record.offset();
+        var partition = record.partition();
+
         count++;
         if (count < 501) {
             throw new RuntimeException("I can't let you do that");
         }
-        messages.put(offset, message);
-        log.info("Reading message {}", message);
+        messages.put(String.format("%s,%s", partition, offset), message);
+        log.info("Reading message {} on partition={}", message, partition);
     }
 
     @EventListener
